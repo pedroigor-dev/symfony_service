@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OwnerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OwnerRepository::class)]
@@ -18,6 +20,17 @@ class Owner
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $phone = null;
+
+    /**
+     * @var Collection<int, Pet>
+     */
+    #[ORM\OneToMany(targetEntity: Pet::class, mappedBy: 'owner')]
+    private Collection $pets;
+
+    public function __construct()
+    {
+        $this->pets = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -44,6 +57,36 @@ class Owner
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pet>
+     */
+    public function getPets(): Collection
+    {
+        return $this->pets;
+    }
+
+    public function addPet(Pet $pet): static
+    {
+        if (!$this->pets->contains($pet)) {
+            $this->pets->add($pet);
+            $pet->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removePet(Pet $pet): static
+    {
+        if ($this->pets->removeElement($pet)) {
+            // set the owning side to null (unless already changed)
+            if ($pet->getOwner() === $this) {
+                $pet->setOwner(null);
+            }
+        }
 
         return $this;
     }

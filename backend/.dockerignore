@@ -3,5 +3,4 @@
 .env.dev
 var/
 vendor/
-docker/
 *.md

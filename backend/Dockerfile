@@ -29,6 +29,9 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
+RUN APP_ENV=prod php bin/console assets:install --no-debug
+RUN APP_ENV=prod php bin/console cache:warmup --no-debug
+
 RUN mkdir -p /var/www/html/var && chown -R www-data:www-data /var/www/html/var
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
